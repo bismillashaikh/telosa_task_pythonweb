@@ -1,17 +1,23 @@
 from flask import Flask, jsonify
+import logging
 
 app = Flask(__name__)
 
+# Setting up logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[
+    logging.FileHandler("/app/app.log"),
+    logging.StreamHandler()
+])
+
 @app.route('/')
 def hello_world():
-    return "Hello World"
+    app.logger.info('Hello World endpoint accessed')
+    return 'Hello World'
 
-@app.route('/error')
+@app.route('/error', methods=['GET', 'POST'])
 def error():
-    app.logger.error("An error occurred!")
-    response = jsonify({"error": "Bad Request"})
-    response.status_code = 400
-    return response
+    app.logger.error('Bad Request error triggered')
+    return jsonify({"error": "Bad Request"}), 400
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)
